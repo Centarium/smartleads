@@ -7,6 +7,8 @@ class Sort
     {
         this.tableID = table;
         this.table = $(table);
+        this.sortBy = null;
+        this.descending = false;
 
         this.state = {
             tableData : {
@@ -69,7 +71,10 @@ class Sort
             let column_type = this.state.tableData.titles[index].datatype,
                 callback = this.getCompareFunction(column_type);
 
-            this.state.tableData.body.sort(callback.bind(null,index));
+            this.descending = this.sortBy === index && !this.descending;
+
+            this.state.tableData.body.sort(callback.bind(this,index));
+            this.sortBy = index;
             this.render();
         })
     }
@@ -88,22 +93,28 @@ class Sort
 
     compareNumbers(index,a,b)
     {
-        return parseInt(a[index]) - parseInt(b[index]);
+        return (this.descending)
+            ? parseInt(a[index]) - parseInt(b[index])
+            : parseInt(b[index]) - parseInt(a[index]);
     }
 
     compareFloat(index,a,b)
     {
-        return parseFloat(a[index]) - parseFloat(b[index]);
+        return (this.descending)
+            ? parseFloat(a[index]) - parseFloat(b[index])
+            : parseFloat(b[index]) - parseFloat(a[index]);
     }
 
     compareString(index,a,b)
     {
         if (a[index] > b[index]) {
-            return 1;
+            return this.descending ? 1 : -1;
         }
         if (a[index] < b[index]) {
-            return -1;
+            return this.descending ? -1 : 1;;
         }
+
+
         return 0;
     }
 
@@ -112,7 +123,9 @@ class Sort
         let d1 = a[index].split('.');
         let d2 = b[index].split('.');
 
-        return new Date(d1[2],d1[1],d1[0]) - new Date(d2[2],d2[1],d2[0]);
+        return this.descending
+             ? new Date(d1[2],d1[1],d1[0]) - new Date(d2[2],d2[1],d2[0])
+             : new Date(d2[2],d2[1],d2[0]) - new Date(d1[2],d1[1],d1[0]);
     }
 
     handlers()
