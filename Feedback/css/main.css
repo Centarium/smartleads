@@ -1,0 +1,9 @@
+body
+{
+    width: 900px;
+    margin: 100px auto;
+}
+.error_message
+{
+    color: red;
+}
