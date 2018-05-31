@@ -4,6 +4,7 @@ namespace FileReader;
 use Exception;
 use SeekableIterator;
 use OutOfBoundsException;
+use Memcache;
 
 /**
  * (like SplFileObject)
@@ -11,15 +12,22 @@ use OutOfBoundsException;
  */
 class TextReader implements SeekableIterator
 {
-    private $position=0;
+    protected $position=0;
 
-    private $fileName;
-    private $fileHandler;
+    protected $fileName;
+    protected $fileHandler;
+    protected $cacheKey='reader_string_';
+    protected $cache;
+
+    protected $cachedString = false;
 
     public function __construct($fileName)
     {
         $this->fileName = $fileName;
+
         $this->rewind();
+
+        $this->createCache();
 
         if(false === $this->fileHandler)
         {
@@ -27,11 +35,38 @@ class TextReader implements SeekableIterator
         }
     }
 
+    protected function createCache()
+    {
+        $memcache = new Memcache();
+        $memcache->addServer('localhost', 11211);
+
+        $this->cache = $memcache;
+
+    }
+
+    protected function getCached($position)
+    {
+        $offset = $this->cache->get( $this->cacheKey.$position );
+        if($offset === false) return false;
+        return fseek($this->fileHandler, $offset);
+
+    }
+
+    protected function setCache()
+    {
+        $offset = ftell($this->fileHandler);
+        $this->cache->set($this->cacheKey.$this->position, $offset, false, 120);
+    }
+
+
     /**
      * @param int $position
      */
     public function seek($position)
     {
+        $this->cachedString = $this->getCached($position);
+        if($this->cachedString !== false) return false;
+
         if($this->position < $position)
         {
             $this->rewind();
@@ -49,7 +84,11 @@ class TextReader implements SeekableIterator
 
     public function current()
     {
-        return fgets($this->fileHandler, 4096);
+        if( $this->cachedString ) return $this->cachedString;
+
+        $this->setCache();
+        $string = $this->currentString();
+        return $string;
     }
 
     public function key()
@@ -57,10 +96,15 @@ class TextReader implements SeekableIterator
         return $this->position;
     }
 
+    public function currentString()
+    {
+        return fgets($this->fileHandler, 4096);
+    }
+
     public function next()
     {
         ++$this->position;
-        $this->current();
+        $this->currentString();
     }
 
     public function rewind()
@@ -78,5 +122,4 @@ class TextReader implements SeekableIterator
     {
         return !feof($this->fileHandler);
     }
-
 }
