@@ -16,7 +16,7 @@
     $controller = new FeedbackController();
     $controller->index();?>
 
-        <form method="post" id="feedback_form" role="form" class="form-horizontal" action="">
+        <form method="post" id="feedback_form" role="form" class="form-horizontal" action="/">
 
             <div class="form-group">
                 <?php $attrib = 'feedback_name'?>
@@ -46,7 +46,7 @@
             </div>
 
             <div class="form-group" style="text-align:center;">
-                <button id="feedback_send" onclick="return false" class="btn btn-default">Send</button>
+                <input type="submit" value="Send" id="feedback_send" onclick="return false" class="btn btn-default">
             </div>
 
         </form>

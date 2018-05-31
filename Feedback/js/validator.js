@@ -35,7 +35,7 @@ class Validator
     {
         this.initialErrorStorage(elems, errorStorage);
 
-        $(document).on('input',elems,{},() =>
+        $(document).on('input',elems,{},(event) =>
         {
             let target = $(event.target);
             let value = target.val();
@@ -60,7 +60,7 @@ class Validator
     {
         this.initialErrorStorage(elems, errorStorage);
 
-        $(document).on('input',elems,{},() =>
+        $(document).on('input',elems,{},(event) =>
         {
             let target = $(event.target);
             let value = target.val();

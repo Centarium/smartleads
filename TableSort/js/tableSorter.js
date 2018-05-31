@@ -64,7 +64,7 @@ class Sort
     {
         let titles = this.tableID + ' thead tr th';
 
-        $(document).on('click',titles,{},() =>
+        $(document).on('click',titles,{},(event) =>
         {
             let target = $(event.target);
             var index = target.context.cellIndex;
