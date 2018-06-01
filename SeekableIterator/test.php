@@ -20,8 +20,8 @@ if( $type == '--seek' && isset($index) )
 
     $reader = new TextReader('text.txt');
     $reader->seek($index);
-    echo $reader->current();
+    echo 'SEEK:'.$index.' RESULT:'.$reader->current();
 
 }
 
-echo "\n".'Время выполнения скрипта: '.round(microtime(true) - $start, 4)." сек.\n";
+//echo "\n".'Время выполнения скрипта: '.round(microtime(true) - $start, 4)." сек.\n";
